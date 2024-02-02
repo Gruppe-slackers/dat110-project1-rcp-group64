@@ -19,4 +19,9 @@
     pass: pass # optional
     # SSH parameters for example: -tt.
     args: # optional
+
+    # git remote add remote <hosturl>
+    # git push -u remote main
+    # git brach origin/main -u remote/main
+    # git push -u origin main
           
