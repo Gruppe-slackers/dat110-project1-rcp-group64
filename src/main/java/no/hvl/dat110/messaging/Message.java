@@ -9,7 +9,7 @@ public class Message {
 
 	// construction a Message with the data provided
 	public Message(final byte[] data) {
-		if (data == null || data.length > 127) {
+		if (data == null || data.length >= 127) {
 			throw new UnsupportedOperationException(TODO.constructor("Message"));
 		}
 		this.data = data;
