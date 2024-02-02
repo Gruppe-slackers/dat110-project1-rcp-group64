@@ -1,22 +1,22 @@
-            - name: Remote SSH Commands
+- name: push_to_uplink_remote
   # You may pin to the exact commit or the version.
   # uses: fifsky/ssh-action@58b3c484be9c20cf118fd3b939a6d2cb3c769512
   uses: fifsky/ssh-action@v0.0.6
   with:
     # Command to execute on the remote server.
-    command: 
+    command: git fetch && git checkout main && git pull && git push upstream -u main
     # Hostname or IP address of the server.
-    host: # optional, default is localhost
+    host: https://ider-database.westeurope.cloudapp.azure.com/Bonobo.Git.Server/ # optional, default is localhost
     # Username for authentication.
-    user: # optional, default is root
+    user: 594743@stud.hvl.no # optional, default is root
     # Port number of the server.
-    port: # optional, default is 22
+    port: 22 # optional, default is 22
     # String that contains a private key for either key-based or hostbased user authentication (OpenSSH format)
-    key: # optional
+    key: process.secret.remote_ssh # optional
     # File location to an identity file
     keyfile: # optional
     # Password for authentication.
-    pass: # optional
+    pass: pass # optional
     # SSH parameters for example: -tt.
     args: # optional
           
