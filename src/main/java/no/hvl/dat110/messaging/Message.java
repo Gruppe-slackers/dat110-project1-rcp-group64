@@ -8,14 +8,11 @@ public class Message {
 	private byte[] data;
 
 	// construction a Message with the data provided
-	public Message(byte[] data) {
-		
-		// TODO - START
-		
-		if (true)
+	public Message(final byte[] data) {
+		if (data == null && data.length > 127) {
 			throw new UnsupportedOperationException(TODO.constructor("Message"));
-			
-		// TODO - END
+		}
+		this.data = data;
 	}
 
 	public byte[] getData() {
