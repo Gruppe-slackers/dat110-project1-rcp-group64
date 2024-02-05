@@ -5,7 +5,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-
 import no.hvl.dat110.TODO;
 
 
@@ -32,34 +31,28 @@ public class MessageConnection {
 		}
 	}
 
-	public void send(Message message) {
-
-		byte[] data;
-		
-		// TODO - START
-		// encapsulate the data contained in the Message and write to the output stream
-		
-		if (true)
+	public void send(Message message) throws IOException {
+		if (message == null || message.getData().length > MessageUtils.SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
-			
-		// TODO - END
+		}
+		byte[] data = message.getData();
+		outStream.write(data, 1, data[0]);
 
 	}
 
-	public Message receive() {
+	public Message receive() throws IOException {
 
-		Message message = null;
-		byte[] data;
-		
-		// TODO - START
-		// read a segment from the input stream and decapsulate data into a Message
-		
-		if (true)
+		int receivedLength = inStream.read();
+		byte[] receivedMessage = inStream.readAllBytes();
+		if (receivedMessage == null || receivedMessage.length > MessageUtils.SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - END
-		
-		return message;
+		}
+
+		if (receivedLength > MessageUtils.SEGMENTSIZE-1 || receivedLength < 0) {
+			throw new UnsupportedOperationException(TODO.method());
+		}
+
+		return MessageUtils.decapsulate(receivedMessage);
 		
 	}
 
