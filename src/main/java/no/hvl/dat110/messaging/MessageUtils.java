@@ -1,7 +1,10 @@
 package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
-import org.apache.maven.surefire.shared.lang3.ArrayUtils;
+
+import java.util.Arrays;
+
+import static java.lang.System.arraycopy;
 
 public class MessageUtils {
 
@@ -18,27 +21,32 @@ public class MessageUtils {
 			return segment;
 		}
 
-		segment = ArrayUtils.addFirst(segment, (byte)data.length);
-		segment = ArrayUtils.addAll(segment, data);
+		int dataLength = MessageUtils.getSegmentSize(data) -1;
 
-		if (segment.length > 128) {
+		if (dataLength > 127) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
+		segment[0] = (byte)dataLength;
+		arraycopy(segment, 1, data, 0, dataLength);
 
 		return segment;
-		
+
 	}
 
 	public static Message decapsulate(byte[] segment) {
 
+		int segmentLength = getSegmentSize(segment);
 		if(segment == null || segment.length > SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
-		byte[] data = segment;
-		data = ArrayUtils.remove(data, 0);
+		byte[] data = new byte[segmentLength];
+		arraycopy(data, 0, segment, 1, segmentLength -1);
 
 		return new Message(data);
-		
 	}
-	
+
+	public static int getSegmentSize(final byte[] bytes) {
+		int index = Arrays.asList(bytes).indexOf(null);
+		return index >= 0 ? index : bytes.length;
+	}
 }

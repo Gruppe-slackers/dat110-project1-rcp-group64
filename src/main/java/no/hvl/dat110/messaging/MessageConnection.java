@@ -5,9 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-
 import no.hvl.dat110.TODO;
-import org.apache.maven.surefire.shared.lang3.ArrayUtils;
 
 
 public class MessageConnection {
