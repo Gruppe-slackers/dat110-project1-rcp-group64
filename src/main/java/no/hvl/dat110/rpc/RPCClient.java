@@ -48,8 +48,11 @@ public class RPCClient {
 	public byte[] call(byte rpcid, byte[] param) {
 		
 		byte[] returnval = null;
+
+		byte[] request = RPCUtils.encapsulate(rpcid, param);
+		returnval = RPCUtils.decapsulate(request);
 		
-		// TODO - START
+		// TODO - START - DONE ^^
 
 		/*
 
