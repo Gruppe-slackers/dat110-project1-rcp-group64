@@ -1,8 +1,10 @@
 package no.hvl.dat110.messaging;
+
 import no.hvl.dat110.TODO;
+
 import java.util.Arrays;
+
 import static java.lang.System.arraycopy;
-import static java.lang.System.in;
 
 public class MessageUtils {
 
@@ -13,40 +15,38 @@ public class MessageUtils {
 
 	public static byte[] encapsulate(Message message) {
 		
-		byte[] segment = new byte[128];
+		byte[] segment = new byte[SEGMENTSIZE];
 		byte[] data = message.getData();
 		if (data == null) {
 			return segment;
 		}
-		int dataLength = Arrays.asList(data).indexOf(null) > 0 ? Arrays.asList(data).indexOf(null) : data.length;
+
+		int dataLength = MessageUtils.getSegmentSize(data) -1;
+
 		if (dataLength > 127) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
-
 		segment[0] = (byte)dataLength;
-		arraycopy(segment, 1, data, 0, segment[dataLength]);
+		arraycopy(segment, 1, data, 0, dataLength);
 
 		return segment;
-		
+
 	}
 
 	public static Message decapsulate(byte[] segment) {
 
-		Message message = null;
-		
-		if (segment.length > 128) {
+		int segmentLength = getSegmentSize(segment);
+		if(segment == null || segment.length > SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
+		byte[] data = new byte[segmentLength];
+		arraycopy(data, 0, segment, 1, segmentLength -1);
 
-		// TODO - END
-		
-		return message;
-		
+		return new Message(data);
 	}
 
 	public static int getSegmentSize(final byte[] bytes) {
 		int index = Arrays.asList(bytes).indexOf(null);
 		return index >= 0 ? index : bytes.length;
 	}
-	
 }
