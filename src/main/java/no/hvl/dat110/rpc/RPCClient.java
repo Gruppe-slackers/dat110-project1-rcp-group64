@@ -37,9 +37,10 @@ public class RPCClient {
 		
 		// TODO - START
 		// disconnect by closing the underlying messaging connection
+
+		if(connection == null) return;
 		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+		connection.close();
 		
 		// TODO - END
 	}
