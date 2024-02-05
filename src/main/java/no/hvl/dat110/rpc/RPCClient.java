@@ -3,39 +3,46 @@ package no.hvl.dat110.rpc;
 import no.hvl.dat110.TODO;
 import no.hvl.dat110.messaging.*;
 
+import java.io.IOException;
+
+import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
+
 public class RPCClient {
 
 	// underlying messaging client used for RPC communication
-	private MessagingClient msgclient;
+	private final MessagingClient msgclient;
 
 	// underlying messaging connection used for RPC communication
 	private MessageConnection connection;
-	
-	public RPCClient(String server, int port) {
-	
-		msgclient = new MessagingClient(server,port);
+
+	public RPCClient(final String server, final int port) {
+		msgclient = new MessagingClient(server, port);
 	}
 	
 	public void connect() {
-		
-		// TODO - START
+		this.connection = msgclient.connect();
 		// connect using the RPC client
 		
-		if (true)
+		if (this.connection == null) {
 			throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - END
+		}
 	}
 	
 	public void disconnect() {
-		
-		// TODO - START
-		// disconnect by closing the underlying messaging connection
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - END
+		this.connection.close();
+		this.msgclient.notify();
+
+		boolean closed;
+		try {
+			this.connection.receive();
+			closed = false;
+		}catch (Exception e) {
+			closed = true;
+		}
+
+		if (!closed) {
+			throw new RuntimeException(TODO.method());
+		}
 	}
 
 	/*
@@ -45,12 +52,17 @@ public class RPCClient {
 	 param is the marshalled parameter of the method to be called
 	 */
 
-	public byte[] call(byte rpcid, byte[] param) {
-		
+	public byte[] call(final byte rpcid, final byte[] param) throws IOException {
+
 		byte[] returnval = null;
-		
 		// TODO - START
 
+		if (getSegmentSize(param) > 127) {
+			throw new UnsupportedOperationException(TODO.method());
+		}
+
+
+		connection.send(new Message(RPCUtils.encapsulate(rpcid, param)));
 		/*
 
 		The rpcid and param must be encapsulated according to the RPC message format

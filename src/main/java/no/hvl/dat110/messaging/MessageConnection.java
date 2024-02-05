@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import no.hvl.dat110.TODO;
+import org.apache.maven.surefire.shared.lang3.ArrayUtils;
 
 
 public class MessageConnection {
@@ -32,18 +33,13 @@ public class MessageConnection {
 		}
 	}
 
-	public void send(Message message) {
-
-		byte[] data;
-		
-		// TODO - START
-		// encapsulate the data contained in the Message and write to the output stream
-		
-		if (true)
+	public void send(Message message) throws IOException {
+		if (message == null || message.getData() == null || message.getData().length > 128 ) {
 			throw new UnsupportedOperationException(TODO.method());
-			
-		// TODO - END
+		}
+		byte[] data = MessageUtils.encapsulate(message);
 
+		outStream.write(data, 1, data[0]);
 	}
 
 	public Message receive() {

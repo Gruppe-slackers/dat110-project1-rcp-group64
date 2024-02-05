@@ -1,10 +1,8 @@
 package no.hvl.dat110.messaging;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import no.hvl.dat110.TODO;
-import org.apache.maven.surefire.shared.lang3.ArrayUtils;
+import java.util.Arrays;
+import static java.lang.System.arraycopy;
+import static java.lang.System.in;
 
 public class MessageUtils {
 
@@ -20,15 +18,13 @@ public class MessageUtils {
 		if (data == null) {
 			return segment;
 		}
-
-		// encapulate/encode the payload data of the message and form a segment
-		// according to the segment format for the messaging layer
-		segment = ArrayUtils.addFirst(segment, (byte)data.length);
-		segment = ArrayUtils.addAll(segment, data);
-
-		if (segment.length > 128) {
+		int dataLength = Arrays.asList(data).indexOf(null) > 0 ? Arrays.asList(data).indexOf(null) : data.length;
+		if (dataLength > 127) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
+
+		segment[0] = (byte)dataLength;
+		arraycopy(segment, 1, data, 0, segment[dataLength]);
 
 		return segment;
 		
@@ -38,16 +34,19 @@ public class MessageUtils {
 
 		Message message = null;
 		
-		// TODO - START
-		// decapsulate segment and put received payload data into a message
-		
-		if (true)
+		if (segment.length > 128) {
 			throw new UnsupportedOperationException(TODO.method());
-		
+		}
+
 		// TODO - END
 		
 		return message;
 		
+	}
+
+	public static int getSegmentSize(final byte[] bytes) {
+		int index = Arrays.asList(bytes).indexOf(null);
+		return index >= 0 ? index : bytes.length;
 	}
 	
 }

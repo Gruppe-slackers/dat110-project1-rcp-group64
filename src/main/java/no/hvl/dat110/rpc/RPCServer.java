@@ -9,17 +9,17 @@ import no.hvl.dat110.messaging.MessagingServer;
 
 public class RPCServer {
 
-	private MessagingServer msgserver;
+	private final MessagingServer msgserver;
 	private MessageConnection connection;
 	
 	// hashmap to register RPC methods which are required to extend RPCRemoteImpl
 	// the key in the hashmap is the RPC identifier of the method
-	private HashMap<Byte,RPCRemoteImpl> services;
+	private final HashMap<Byte,RPCRemoteImpl> services;
 	
 	public RPCServer(int port) {
 		
 		this.msgserver = new MessagingServer(port);
-		this.services = new HashMap<Byte,RPCRemoteImpl>();
+		this.services = new HashMap<>();
 		
 	}
 	
@@ -39,7 +39,8 @@ public class RPCServer {
 		while (!stop) {
 	    
 		   byte rpcid = 0;
-		   Message requestmsg, replymsg;
+		   Message requestmsg;
+		   Message replymsg;
 		   
 		   // TODO - START
 		   // - receive a Message containing an RPC request
