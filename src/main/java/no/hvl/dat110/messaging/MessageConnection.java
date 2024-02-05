@@ -44,11 +44,11 @@ public class MessageConnection {
 
 	public Message receive() throws IOException {
 
+		int receivedLength = inStream.read();
 		byte[] receivedMessage = inStream.readAllBytes();
 		if (receivedMessage == null || receivedMessage.length > MessageUtils.SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
-		int receivedLength = receivedMessage[0];
 
 		if (receivedLength > MessageUtils.SEGMENTSIZE-1 || receivedLength < 0) {
 			throw new UnsupportedOperationException(TODO.method());
