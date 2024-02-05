@@ -2,7 +2,9 @@ package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.System.arraycopy;
 
@@ -14,20 +16,19 @@ public class MessageUtils {
 	public static String MESSAGINGHOST = "localhost";
 
 	public static byte[] encapsulate(Message message) {
-		
-		byte[] segment = new byte[SEGMENTSIZE];
 		byte[] data = message.getData();
 		if (data == null) {
-			return segment;
+			return null;
 		}
 
 		int dataLength = MessageUtils.getSegmentSize(data) -1;
 
-		if (dataLength > 127) {
+		if (dataLength > SEGMENTSIZE-1) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
+		byte[] segment = new byte[SEGMENTSIZE];
 		segment[0] = (byte)dataLength;
-		arraycopy(segment, 1, data, 0, dataLength);
+		arraycopy(data, 0, segment, 1, dataLength);
 
 		return segment;
 

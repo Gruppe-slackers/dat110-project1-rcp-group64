@@ -5,6 +5,7 @@ import no.hvl.dat110.messaging.*;
 
 import java.io.IOException;
 
+import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
 
 public class RPCClient {
@@ -53,30 +54,33 @@ public class RPCClient {
 	 */
 
 	public byte[] call(final byte rpcid, final byte[] param) throws IOException {
-
-		byte[] returnval = null;
-		// TODO - START
-
-		if (getSegmentSize(param) > 127) {
+		if (getSegmentSize(param) > SEGMENTSIZE-1) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
 
 
-		connection.send(new Message(RPCUtils.encapsulate(rpcid, param)));
-		/*
+		Message message = new Message(RPCUtils.encapsulate(rpcid, param));
 
-		The rpcid and param must be encapsulated according to the RPC message format
-
-		The return value from the RPC call must be decapsulated according to the RPC message format
-
-		*/
-				
-		if (true)
+		if (message == null) {
 			throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - END
-		return returnval;
-		
+		}
+
+		connection.send(message);
+		connection.notify();
+		try {
+			connection.wait();
+			Message response = connection.receive();
+			byte[] responseData = response.getData();
+			if (response == null || responseData == null) {
+				return null;
+			}
+			connection.notify();
+			return RPCUtils.decapsulate(responseData);
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
