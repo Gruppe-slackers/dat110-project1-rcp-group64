@@ -23,7 +23,7 @@ public class MessageUtils {
 
 		int dataLength = MessageUtils.getSegmentSize(data) -1;
 
-		if (dataLength > 127) {
+		if (dataLength > SEGMENTSIZE-1) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
 		segment[0] = (byte)dataLength;
