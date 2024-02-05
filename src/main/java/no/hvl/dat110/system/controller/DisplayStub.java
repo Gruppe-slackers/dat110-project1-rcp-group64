@@ -1,6 +1,5 @@
 package no.hvl.dat110.system.controller;
 
-import no.hvl.dat110.TODO;
 import no.hvl.dat110.rpc.*;
 
 public class DisplayStub extends RPCLocalStub {
@@ -17,8 +16,8 @@ public class DisplayStub extends RPCLocalStub {
 		// Make RPC for write
 		byte[] response = rpcclient.call((byte)Common.WRITE_RPCID, request);
 
-		// Unmarshalling to String
-		String reply = RPCUtils.unmarshallString(response);
+		// Unmarshalling
+		RPCUtils.unmarshallVoid(response);
 
 	}
 }
