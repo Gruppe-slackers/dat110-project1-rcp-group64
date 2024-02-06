@@ -37,8 +37,16 @@ public class Controller  {
 		sensorclient.connect();
 
 		// read value from sensor using RPC and write to display using RPC
-		String value = String.valueOf(sensor.read());
-		display.write(value);
+		String value = "Error";
+
+		for (int i = 0; i <= N; i++) {
+			value = String.valueOf(sensor.read());
+			try {
+				display.write(value);
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+		}
 
 		try {
 			stopdisplay.stop();
