@@ -4,6 +4,8 @@ import no.hvl.dat110.rpc.RPCClient;
 import no.hvl.dat110.rpc.RPCLocalStub;
 import no.hvl.dat110.rpc.RPCUtils;
 
+import java.io.IOException;
+
 public class TestIntIntStub extends RPCLocalStub {
 	
 	public TestIntIntStub(RPCClient rpcclient) {
@@ -13,9 +15,13 @@ public class TestIntIntStub extends RPCLocalStub {
 	public int m(int x) {
 				
 		byte[] request = RPCUtils.marshallInteger(x);
-		
-		byte[] reply = rpcclient.call((byte)3,request);
-		
+		byte[] reply = new byte[127];
+		try{
+			reply = rpcclient.call((byte)3,request);
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+
 		int xres = RPCUtils.unmarshallInteger(reply);
 		
 		return xres;

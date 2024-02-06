@@ -2,7 +2,6 @@ package no.hvl.dat110.system.controller;
 
 import no.hvl.dat110.TODO;
 import no.hvl.dat110.rpc.*;
-
 import java.io.IOException;
 
 public class DisplayStub extends RPCLocalStub {
@@ -13,13 +12,17 @@ public class DisplayStub extends RPCLocalStub {
 	
 	public void write (String message) {
 
-		try {
-			byte[] request = RPCUtils.marshallString(message);
-			byte[] response = rpcclient.call((byte)Common.WRITE_RPCID, request);
-			String reply = RPCUtils.unmarshallString(response);
-		} catch (IOException e){
-			System.out.println("Oops");
+		byte[] request = RPCUtils.marshallString(message);
+		byte[] response = new byte[127];
+
+		try{
+			response = rpcclient.call((byte)Common.WRITE_RPCID, request);
+		}catch (IOException e){
+			System.err.println("error: " + e);
+			e.printStackTrace();
 		}
+		String reply = RPCUtils.unmarshallString(response);
+
 
 	}
 }
