@@ -17,12 +17,10 @@ public class DisplayImpl extends RPCRemoteImpl {
 	
 	public byte[] invoke(byte[] param) {
 
-		String s = RPCUtils.unmarshallString(param);
+		String resonse = RPCUtils.unmarshallString(param);
 
-		write(s);
+		write(resonse);
 
-		byte[] returnval = RPCUtils.marshallString(s);
-
-		return returnval;
+		return RPCUtils.marshallString(resonse);
 	}
 }
