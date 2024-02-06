@@ -1,10 +1,6 @@
 package no.hvl.dat110.rpc;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import no.hvl.dat110.TODO;
 
