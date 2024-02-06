@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 
 
 public class MessageConnection {
@@ -14,7 +15,9 @@ public class MessageConnection {
 	private DataOutputStream outStream; // for writing bytes to the underlying TCP connection
 	private DataInputStream inStream; // for reading bytes from the underlying TCP connection
 	private Socket socket; // socket for the underlying TCP connection
-	
+	public final Semaphore reqQueue = new Semaphore(1);
+	public final Semaphore resQueue = new Semaphore(1);
+
 	public MessageConnection(Socket socket) {
 
 		try {
@@ -38,7 +41,6 @@ public class MessageConnection {
 		}
 		byte[] data = message.getData();
 		outStream.write(data, 1, data[0]);
-
 	}
 
 	public Message receive() throws IOException {
