@@ -98,6 +98,7 @@ public class RPCServer {
 			System.out.println("RPCServer.stop - connection was null");
 		}
 
+		//noinspection ConstantValue
 		if (this.msgserver != null) {
 			this.msgserver.stop();
 		} else {
