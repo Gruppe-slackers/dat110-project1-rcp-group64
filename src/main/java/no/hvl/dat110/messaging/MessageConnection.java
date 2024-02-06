@@ -44,6 +44,10 @@ public class MessageConnection {
 	public Message receive() throws IOException {
 
 		int receivedLength = inStream.read();
+		if (receivedLength == -1) {
+			return null;
+		}
+
 		byte[] receivedMessage = inStream.readAllBytes();
 		if (receivedMessage == null || receivedMessage.length > MessageUtils.SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());

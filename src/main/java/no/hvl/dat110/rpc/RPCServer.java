@@ -45,8 +45,9 @@ public class RPCServer {
 		while (!stop) {
 			try {
 				requestmsg = connection.receive();
-				if (replymsg == null) {
-					throw new UnsupportedOperationException(TODO.method());
+				while (requestmsg == null) {
+					connection.wait();
+					requestmsg = connection.receive();
 				}
 				rpcid = requestmsg.getData()[0];
 				if (!services.containsKey(rpcid)) {
@@ -58,19 +59,28 @@ public class RPCServer {
 
 				replymsg = new Message(RPCUtils.encapsulate(rpcid, responeBytes));
 
-			} catch (IOException e) {
+			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}
 
 
-		   if (replymsg == null || replymsg.getData().length > SEGMENTSIZE) {
+            if (replymsg == null || replymsg.getData().length > SEGMENTSIZE) {
 			   throw new UnsupportedOperationException(TODO.method());
 		   }
 
-			// stop the server if it was stop methods that was called
+			try {
+				connection.send(replymsg);
+			} catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // stop the server if it was stop methods that was called
 		   if (rpcid == RPCCommon.RPIDSTOP) {
+			   rpcstop.invoke(new byte[0]);
 			   stop = true;
 		   }
+		   connection.notify();
+		   notify();
 		}
 	
 	}
