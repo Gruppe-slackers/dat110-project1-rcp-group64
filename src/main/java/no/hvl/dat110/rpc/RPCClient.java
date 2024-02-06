@@ -25,7 +25,7 @@ public class RPCClient extends Thread {
 	public void connect() {
 		this.connection = msgclient.connect();
 		// connect using the RPC client
-		
+
 		if (this.connection == null) {
 			throw new UnsupportedOperationException(TODO.method());
 		}

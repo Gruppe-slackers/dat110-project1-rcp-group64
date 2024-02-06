@@ -1,8 +1,8 @@
 package no.hvl.dat110.system.controller;
 
-import no.hvl.dat110.rpc.RPCClient;
-import no.hvl.dat110.rpc.RPCLocalStub;
-import no.hvl.dat110.rpc.RPCUtils;
+import no.hvl.dat110.TODO;
+import no.hvl.dat110.rpc.*;
+import java.io.IOException;
 
 public class SensorStub extends RPCLocalStub {
 
@@ -16,7 +16,12 @@ public class SensorStub extends RPCLocalStub {
 		byte[] request = RPCUtils.marshallVoid();
 
 		// make remote procedure call for read
-		byte[] response = rpcclient.call((byte)Common.READ_RPCID, request);
+		byte[] response = new byte[127];
+		try{
+			response = rpcclient.call((byte)Common.READ_RPCID, request);
+		}catch (IOException e){
+			e.printStackTrace();
+		}
 
 		// unmarshall the return value from the call (an integer)
 		int temp = RPCUtils.unmarshallInteger(response);
