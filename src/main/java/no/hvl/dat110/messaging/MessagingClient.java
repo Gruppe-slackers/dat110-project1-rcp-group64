@@ -1,11 +1,10 @@
 package no.hvl.dat110.messaging;
 
 
+import no.hvl.dat110.TODO;
+
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketAddress;
-
-import no.hvl.dat110.TODO;
 
 public class MessagingClient {
 

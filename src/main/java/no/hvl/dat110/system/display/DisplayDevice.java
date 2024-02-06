@@ -1,8 +1,6 @@
 package no.hvl.dat110.system.display;
 
 import no.hvl.dat110.TODO;
-import no.hvl.dat110.rpc.RPCServer;
-import no.hvl.dat110.system.controller.Common;
 
 
 public class DisplayDevice {

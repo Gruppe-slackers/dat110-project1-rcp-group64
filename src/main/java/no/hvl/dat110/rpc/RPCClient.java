@@ -1,7 +1,9 @@
 package no.hvl.dat110.rpc;
 
 import no.hvl.dat110.TODO;
-import no.hvl.dat110.messaging.*;
+import no.hvl.dat110.messaging.Message;
+import no.hvl.dat110.messaging.MessageConnection;
+import no.hvl.dat110.messaging.MessagingClient;
 
 import java.io.IOException;
 
@@ -71,7 +73,7 @@ public class RPCClient {
 			connection.wait();
 			Message response = connection.receive();
 			byte[] responseData = response.getData();
-			if (response == null || responseData == null) {
+			if (responseData == null) {
 				return null;
 			}
 			connection.notify();

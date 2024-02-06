@@ -1,8 +1,8 @@
 package no.hvl.dat110.rpc;
 
-import java.math.BigInteger;
-
 import no.hvl.dat110.TODO;
+
+import java.math.BigInteger;
 
 import static java.lang.System.arraycopy;
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
