@@ -4,6 +4,8 @@ import no.hvl.dat110.TODO;
 import no.hvl.dat110.rpc.RPCClient;
 import no.hvl.dat110.rpc.RPCClientStopStub;
 
+import java.io.IOException;
+
 public class Controller  {
 	
 	private static int N = 5;
@@ -35,10 +37,14 @@ public class Controller  {
 			throw new UnsupportedOperationException(TODO.method());
 		
 		// TODO - END
-		
-		stopdisplay.stop();
-		stopsensor.stop();
-	
+
+		try {
+			stopdisplay.stop();
+			stopsensor.stop();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		displayclient.disconnect();
 		sensorclient.disconnect();
 		

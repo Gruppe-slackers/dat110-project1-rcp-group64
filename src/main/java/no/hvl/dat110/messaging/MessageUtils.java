@@ -1,7 +1,12 @@
 package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
-import org.apache.maven.surefire.shared.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.lang.System.arraycopy;
 
 public class MessageUtils {
 
@@ -11,34 +16,38 @@ public class MessageUtils {
 	public static String MESSAGINGHOST = "localhost";
 
 	public static byte[] encapsulate(Message message) {
-		
-		byte[] segment = new byte[SEGMENTSIZE];
 		byte[] data = message.getData();
 		if (data == null) {
-			return segment;
+			return null;
 		}
 
-		segment = ArrayUtils.addFirst(segment, (byte)data.length);
-		segment = ArrayUtils.addAll(segment, data);
+		int dataLength = MessageUtils.getSegmentSize(data) -1;
 
-		if (segment.length > 128) {
+		if (dataLength > SEGMENTSIZE-1) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
+		byte[] segment = new byte[SEGMENTSIZE];
+		segment[0] = (byte)dataLength;
+		arraycopy(data, 0, segment, 1, dataLength);
 
 		return segment;
-		
+
 	}
 
 	public static Message decapsulate(byte[] segment) {
 
+		int segmentLength = getSegmentSize(segment);
 		if(segment == null || segment.length > SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
-		byte[] data = segment;
-		data = ArrayUtils.remove(data, 0);
+		byte[] data = new byte[segmentLength];
+		arraycopy(data, 0, segment, 1, segmentLength -1);
 
 		return new Message(data);
-		
 	}
-	
+
+	public static int getSegmentSize(final byte[] bytes) {
+		int index = Arrays.asList(bytes).indexOf(null);
+		return index >= 0 ? index : bytes.length;
+	}
 }
