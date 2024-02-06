@@ -10,7 +10,7 @@ import java.io.IOException;
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
 
-public class RPCClient {
+public class RPCClient extends Thread {
 
 	// underlying messaging client used for RPC communication
 	private final MessagingClient msgclient;
@@ -60,23 +60,37 @@ public class RPCClient {
 			throw new UnsupportedOperationException(TODO.method());
 		}
 
-
 		Message message = new Message(RPCUtils.encapsulate(rpcid, param));
 
 		if (message == null) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
 
-		connection.send(message);
-		connection.notify();
 		try {
-			connection.wait();
+			byte[] responseData = null;
+
+			connection.reqQueue.acquire();
+			connection.send(message);
 			Message response = connection.receive();
-			byte[] responseData = response.getData();
+			while (response == null) {
+				connection.wait();
+				response = connection.receive();
+
+				/** making sure we get response matching our rpcid */
+				if (response != null) {
+					responseData = response.getData();
+					if (responseData != null && (int) responseData[0] != rpcid) {
+						response = null;
+					}
+				}
+			}
+
+			/** release and notify other clients to ask for request */
+			connection.reqQueue.release();
+			connection.notify();
 			if (responseData == null) {
 				return null;
 			}
-			connection.notify();
 			return RPCUtils.decapsulate(responseData);
 
 		} catch (InterruptedException e) {
