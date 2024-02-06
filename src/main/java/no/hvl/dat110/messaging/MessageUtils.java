@@ -19,9 +19,11 @@ public class MessageUtils {
 			return null;
 		}
 
-		int dataLength = MessageUtils.getSegmentSize(data) -1;
+		int dataLength = MessageUtils.getSegmentSize(data);
 
-		if (dataLength > SEGMENTSIZE-1) {
+		System.out.print(dataLength + Arrays.toString(data));
+
+		if (dataLength >= SEGMENTSIZE || dataLength < 0) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
 		byte[] segment = new byte[SEGMENTSIZE];
@@ -33,19 +35,21 @@ public class MessageUtils {
 	}
 
 	public static Message decapsulate(byte[] segment) {
-
-		int segmentLength = getSegmentSize(segment);
-		if(segment == null || segment.length > SEGMENTSIZE) {
+		if (segment == null) {
+			return null;
+		}
+		int segmentLength = Byte.toUnsignedInt(segment[0]);
+		if(segmentLength >= SEGMENTSIZE) {
 			throw new UnsupportedOperationException(TODO.method());
 		}
 		byte[] data = new byte[segmentLength];
-		arraycopy(data, 0, segment, 1, segmentLength -1);
+		arraycopy(segment, 1, data, 0, segmentLength);
 
 		return new Message(data);
 	}
 
 	public static int getSegmentSize(final byte[] bytes) {
 		int index = Arrays.asList(bytes).indexOf(null);
-		return index >= 0 ? index : bytes.length;
+		return index != -1 ? index : bytes.length;
 	}
 }
