@@ -1,11 +1,12 @@
 package no.hvl.dat110.messaging;
 
 
+import no.hvl.dat110.TODO;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import no.hvl.dat110.TODO;
 
 
 public class MessageConnection {

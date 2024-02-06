@@ -1,12 +1,12 @@
 package no.hvl.dat110.rpc;
 
+import no.hvl.dat110.TODO;
+import no.hvl.dat110.messaging.Message;
+import no.hvl.dat110.messaging.MessageConnection;
+import no.hvl.dat110.messaging.MessagingServer;
+
 import java.io.IOException;
 import java.util.HashMap;
-
-import no.hvl.dat110.TODO;
-import no.hvl.dat110.messaging.MessageConnection;
-import no.hvl.dat110.messaging.Message;
-import no.hvl.dat110.messaging.MessagingServer;
 
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 
