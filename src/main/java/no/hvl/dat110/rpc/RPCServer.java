@@ -1,5 +1,6 @@
 package no.hvl.dat110.rpc;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import no.hvl.dat110.TODO;
@@ -7,19 +8,21 @@ import no.hvl.dat110.messaging.MessageConnection;
 import no.hvl.dat110.messaging.Message;
 import no.hvl.dat110.messaging.MessagingServer;
 
+import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
+
 public class RPCServer {
 
-	private MessagingServer msgserver;
+	private final MessagingServer msgserver;
 	private MessageConnection connection;
 	
 	// hashmap to register RPC methods which are required to extend RPCRemoteImpl
 	// the key in the hashmap is the RPC identifier of the method
-	private HashMap<Byte,RPCRemoteImpl> services;
+	private final HashMap<Byte,RPCRemoteImpl> services;
 	
 	public RPCServer(int port) {
 		
 		this.msgserver = new MessagingServer(port);
-		this.services = new HashMap<Byte,RPCRemoteImpl>();
+		this.services = new HashMap<>();
 		
 	}
 	
@@ -30,30 +33,39 @@ public class RPCServer {
 		
 		System.out.println("RPC SERVER RUN - Services: " + services.size());
 			
-		connection = msgserver.accept(); 
-		
+		connection = msgserver.accept();
 		System.out.println("RPC SERVER ACCEPTED");
 		
 		boolean stop = false;
-		
+
+		byte rpcid = 0;
+		Message requestmsg = null;
+		Message replymsg = null;
+
 		while (!stop) {
-	    
-		   byte rpcid = 0;
-		   Message requestmsg, replymsg;
-		   
-		   // TODO - START
-		   // - receive a Message containing an RPC request
-		   // - extract the identifier for the RPC method to be invoked from the RPC request
-		   // - extract the method's parameter by decapsulating using the RPCUtils
-		   // - lookup the method to be invoked
-		   // - invoke the method and pass the param
-		   // - encapsulate return value 
-		   // - send back the message containing the RPC reply
-			
-		   if (true)
-				throw new UnsupportedOperationException(TODO.method());
-		   
-		   // TODO - END
+			try {
+				requestmsg = connection.receive();
+				if (replymsg == null) {
+					throw new UnsupportedOperationException(TODO.method());
+				}
+				rpcid = requestmsg.getData()[0];
+				if (!services.containsKey(rpcid)) {
+					throw new UnsupportedOperationException(TODO.method());
+				}
+
+				byte[] requestBytes = RPCUtils.decapsulate(requestmsg.getData());
+				byte[] responeBytes = services.get(rpcid).invoke(requestBytes);
+
+				replymsg = new Message(RPCUtils.encapsulate(rpcid, responeBytes));
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+
+		   if (replymsg == null || replymsg.getData().length > SEGMENTSIZE) {
+			   throw new UnsupportedOperationException(TODO.method());
+		   }
 
 			// stop the server if it was stop methods that was called
 		   if (rpcid == RPCCommon.RPIDSTOP) {
@@ -70,17 +82,17 @@ public class RPCServer {
 	
 	public void stop() {
 
-		if (connection != null) {
-			connection.close();
+		if (this.connection != null) {
+			this.connection.close();
 		} else {
 			System.out.println("RPCServer.stop - connection was null");
 		}
-		
-		if (msgserver != null) {
-			msgserver.stop();
+
+		if (this.msgserver != null) {
+			this.msgserver.stop();
 		} else {
 			System.out.println("RPCServer.stop - msgserver was null");
 		}
-		
+
 	}
 }

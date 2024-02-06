@@ -3,7 +3,7 @@ package no.hvl.dat110.rpc;
 public class RPCServerStopImpl extends RPCRemoteImpl {
 
 	public RPCServerStopImpl(byte rpcid, RPCServer rpcserver) {
-		super(rpcid,rpcserver);
+		super(rpcid, rpcserver);
 	}
 	
 	// RPC server-side implementation of the built-in stop RPC method
