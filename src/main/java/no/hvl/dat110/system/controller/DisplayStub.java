@@ -2,6 +2,7 @@ package no.hvl.dat110.system.controller;
 
 import no.hvl.dat110.TODO;
 import no.hvl.dat110.rpc.*;
+import java.io.IOException;
 
 public class DisplayStub extends RPCLocalStub {
 
@@ -10,19 +11,18 @@ public class DisplayStub extends RPCLocalStub {
 	}
 	
 	public void write (String message) {
-		
-		// TODO - START - DONE!
-		// implement marshalling, call and unmarshalling for write RPC method
 
 		byte[] request = RPCUtils.marshallString(message);
-		byte[] response = rpcclient.call((byte)Common.WRITE_RPCID, request);
-		String reply = RPCUtils.unmarshallString(response);
-		
+		byte[] response = new byte[127];
 
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - END
+		try{
+			response = rpcclient.call((byte)Common.WRITE_RPCID, request);
+		}catch (IOException e){
+			System.err.println("error: " + e);
+			e.printStackTrace();
+		}
+		String reply = RPCUtils.unmarshallString(response);
+
 		
 	}
 }
