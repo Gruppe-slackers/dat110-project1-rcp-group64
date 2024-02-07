@@ -3,9 +3,11 @@ package no.hvl.dat110.rpc;
 import no.hvl.dat110.TODO;
 import no.hvl.dat110.messaging.Message;
 import no.hvl.dat110.messaging.MessageConnection;
+import no.hvl.dat110.messaging.MessageUtils;
 import no.hvl.dat110.messaging.MessagingClient;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
@@ -59,17 +61,20 @@ public class RPCClient extends Thread {
 			throw new UnsupportedOperationException();
 		}
 
-		Message message = new Message(RPCUtils.encapsulate(rpcid, param));
-		System.out.println(message);
+		byte[] rpcBytes = RPCUtils.encapsulate(rpcid, param);
+		Message rpcMessage = new Message(rpcBytes);
 		final MessageConnection messageConnection = this.connection;
 		synchronized (messageConnection) {
 			try {
 				byte[] responseData = null;
-
 				messageConnection.reqQueue.acquire();
-				messageConnection.send(message);
+				messageConnection.send(rpcMessage);
+
+
 				Message response = messageConnection.receive();
+				System.out.println("SADGE");
 				while (response == null) {
+					System.out.println("response == null");
 					response = messageConnection.receive();
 
 					/** making sure we get response matching our rpcid */
@@ -81,6 +86,8 @@ public class RPCClient extends Thread {
 					}
 				}
 
+				messageConnection.resQueue.release();
+				System.out.println("POGG");
 				/** release and notify other clients to ask for request */
 				messageConnection.reqQueue.release();
 				messageConnection.notify();

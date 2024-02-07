@@ -45,12 +45,12 @@ public class RPCServer implements Runnable {
 		synchronized (messageConnection) {
 			while (!stop) {
 				try {
+					messageConnection.resQueue.acquire();
 					requestmsg = messageConnection.receive();
 					while (requestmsg == null) {
-						messageConnection.wait();
 						requestmsg = messageConnection.receive();
 					}
-					messageConnection.resQueue.release();
+
 
 					if (getSegmentSize(requestmsg.getData()) > SEGMENTSIZE) {
 						throw new UnsupportedOperationException(TODO.method());
@@ -69,7 +69,6 @@ public class RPCServer implements Runnable {
 						byte[] responseBytes = services.get(rpcid).invoke(requestBytes);
 
 						replymsg = new Message(RPCUtils.encapsulate(rpcid, responseBytes));
-						messageConnection.notify();
 					}
 
 				} catch (IOException | InterruptedException e) {
@@ -78,7 +77,7 @@ public class RPCServer implements Runnable {
 
 
 				if (replymsg == null || replymsg.getData().length > SEGMENTSIZE) {
-					throw new UnsupportedOperationException(TODO.method());
+					throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 				}
 
 				try {
@@ -93,6 +92,7 @@ public class RPCServer implements Runnable {
 					stop = true;
 				}
 				messageConnection.notify();
+				messageConnection.resQueue.release();
 			}
 		}
 	
