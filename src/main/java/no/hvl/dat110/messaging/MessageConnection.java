@@ -2,6 +2,7 @@ package no.hvl.dat110.messaging;
 
 
 import no.hvl.dat110.TODO;
+import no.hvl.dat110.utils.ErrorMessages;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -61,8 +62,11 @@ public class MessageConnection {
 			receivedMessage = inStream.readNBytes(receivedLength);
 		}
 
-		if (receivedMessage == null || receivedMessage.length > MessageUtils.SEGMENTSIZE) {
-			throw new UnsupportedOperationException("Mottatt data er ikke gyldig");
+		if (receivedMessage == null) {
+			throw new UnsupportedOperationException(ErrorMessages.invalidType());
+		}
+		if (receivedMessage.length > MessageUtils.SEGMENTSIZE) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
 		return new Message(receivedMessage);

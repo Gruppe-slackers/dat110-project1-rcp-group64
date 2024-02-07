@@ -1,6 +1,7 @@
 package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
+import no.hvl.dat110.utils.ErrorMessages;
 
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 
@@ -11,8 +12,8 @@ public class Message {
 
 	// construction a Message with the data provided
 	public Message(final byte[] data) {
-		if (data == null || data.length >= SEGMENTSIZE) {
-			throw new UnsupportedOperationException("Message is too long");
+		if (data.length >= SEGMENTSIZE) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 		this.data = data;
 	}

@@ -1,19 +1,23 @@
 package no.hvl.dat110.rpc;
 
 import no.hvl.dat110.TODO;
+import no.hvl.dat110.utils.ErrorMessages;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
 
 public class RPCUtils {
+
+	public static final int MARSHALSIZE = SEGMENTSIZE - 1;
 	
 	public static byte[] encapsulate(byte rpcid, byte[] payload) {
 		int segmentSize = getSegmentSize(payload);
-		if (segmentSize > SEGMENTSIZE-1) {
-			throw new UnsupportedOperationException(TODO.method());
+		if (segmentSize > MARSHALSIZE-1) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
 		byte[] rpcmsg = new byte[segmentSize + 1];
@@ -24,25 +28,26 @@ public class RPCUtils {
 	}
 	
 	public static byte[] decapsulate(byte[] rpcmsg) {
-
-		int segmentSize = getSegmentSize(rpcmsg);
-		if (segmentSize > SEGMENTSIZE) {
-			throw new UnsupportedOperationException(TODO.method());
+		System.out.println("DEC: " + Arrays.toString(rpcmsg));
+		if (rpcmsg == null || rpcmsg.length == 0) {
+			return null;
+		}
+		if (rpcmsg.length >= MARSHALSIZE) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
-		byte[] payload = new byte[segmentSize -1];
-		arraycopy(rpcmsg, 0, payload, 0, segmentSize);
+		byte[] payload = new byte[rpcmsg.length -1];
+		arraycopy(rpcmsg, 1, payload, 0, rpcmsg.length -1);
 		
 		return payload;
-		
 	}
 
 	// convert String to byte array
 	public static byte[] marshallString(String str) {
 		
 		byte[] encoded = str.getBytes();
-		if (encoded.length > SEGMENTSIZE-1) {
-			throw new UnsupportedOperationException(TODO.method());
+		if (encoded.length > MARSHALSIZE-1) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
 		return encoded;
@@ -50,8 +55,8 @@ public class RPCUtils {
 
 	// convert byte array to a String
 	public static String unmarshallString(byte[] data) {
-		if (getSegmentSize(data) > SEGMENTSIZE)
-			throw new UnsupportedOperationException(TODO.method());
+		if (getSegmentSize(data) > MARSHALSIZE)
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 
 
 		return new String(data);
@@ -62,10 +67,12 @@ public class RPCUtils {
 	}
 	
 	public static void unmarshallVoid(byte[] data) {
-		if (data.length >= 1) {
-			throw new UnsupportedOperationException(TODO.method());
+		if (data == null) {
+			return;
 		}
-
+		if (data.length == 1) {
+			throw new UnsupportedOperationException(ErrorMessages.invalidType());
+		}
 	}
 
 	// convert boolean to a byte array representation
@@ -95,8 +102,8 @@ public class RPCUtils {
 
 		byte[] encoded = BigInteger.valueOf(x).toByteArray();
 
-		if (getSegmentSize(encoded) > SEGMENTSIZE-1) {
-			throw new UnsupportedOperationException(TODO.method());
+		if (getSegmentSize(encoded) > MARSHALSIZE-1) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
 		return encoded;
@@ -105,11 +112,10 @@ public class RPCUtils {
 	// byte array representation to integer
 	public static int unmarshallInteger(byte[] data) {
 
-		if (getSegmentSize(data) > SEGMENTSIZE-1) {
-			throw new UnsupportedOperationException(TODO.method());
+		if (getSegmentSize(data) > MARSHALSIZE-1) {
+			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
 		return new BigInteger(data).intValue();
-		
 	}
 }

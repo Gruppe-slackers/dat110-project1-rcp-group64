@@ -4,6 +4,8 @@ import no.hvl.dat110.TODO;
 import no.hvl.dat110.messaging.Message;
 import no.hvl.dat110.messaging.MessageConnection;
 import no.hvl.dat110.messaging.MessagingServer;
+import no.hvl.dat110.utils.ErrorMessages;
+
 import java.io.IOException;
 import java.util.HashMap;
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
@@ -11,7 +13,7 @@ import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
 
 public class RPCServer implements Runnable {
 
-	private MessagingServer msgserver;
+	private final MessagingServer msgserver;
 	private MessageConnection connection;
 	
 	// hashmap to register RPC methods which are required to extend RPCRemoteImpl
@@ -39,51 +41,59 @@ public class RPCServer implements Runnable {
 		Message requestmsg;
 		Message replymsg = null;
 
-		while (!stop) {
-			try {
-				requestmsg = connection.receive();
-				while (requestmsg == null) {
-					connection.wait();
-					requestmsg = connection.receive();
-				}
-				connection.resQueue.release();
+		final MessageConnection messageConnection = this.connection;
+		synchronized (messageConnection) {
+			while (!stop) {
+				try {
+					requestmsg = messageConnection.receive();
+					while (requestmsg == null) {
+						messageConnection.wait();
+						requestmsg = messageConnection.receive();
+					}
+					messageConnection.resQueue.release();
 
-				if (getSegmentSize(requestmsg.getData()) > SEGMENTSIZE) {
+					if (getSegmentSize(requestmsg.getData()) > SEGMENTSIZE) {
+						throw new UnsupportedOperationException(TODO.method());
+					}
+
+					byte[] request = requestmsg.getData();
+					if (request.length == 0) {
+						replymsg = requestmsg;
+					} else {
+						rpcid = request[0];
+						if (!services.containsKey(rpcid)) {
+							throw new UnsupportedOperationException(ErrorMessages.missingRPCID());
+						}
+
+						byte[] requestBytes = RPCUtils.decapsulate(requestmsg.getData());
+						byte[] responseBytes = services.get(rpcid).invoke(requestBytes);
+
+						replymsg = new Message(RPCUtils.encapsulate(rpcid, responseBytes));
+						messageConnection.notify();
+					}
+
+				} catch (IOException | InterruptedException e) {
+					e.printStackTrace();
+				}
+
+
+				if (replymsg == null || replymsg.getData().length > SEGMENTSIZE) {
 					throw new UnsupportedOperationException(TODO.method());
 				}
 
-				rpcid = requestmsg.getData()[0];
-				if (!services.containsKey(rpcid)) {
-					throw new UnsupportedOperationException(TODO.method());
+				try {
+					messageConnection.send(replymsg);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 
-				byte[] requestBytes = RPCUtils.decapsulate(requestmsg.getData());
-				byte[] responseBytes = services.get(rpcid).invoke(requestBytes);
-
-				replymsg = new Message(RPCUtils.encapsulate(rpcid, responseBytes));
-				connection.notify();
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+				// stop the server if it was stop methods that was called
+				if (rpcid == RPCCommon.RPIDSTOP) {
+					rpcstop.invoke(new byte[0]);
+					stop = true;
+				}
+				messageConnection.notify();
 			}
-
-
-            if (replymsg == null || replymsg.getData().length > SEGMENTSIZE) {
-			   throw new UnsupportedOperationException(TODO.method());
-		   }
-
-			try {
-				connection.send(replymsg);
-			} catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // stop the server if it was stop methods that was called
-		   if (rpcid == RPCCommon.RPIDSTOP) {
-			   rpcstop.invoke(new byte[0]);
-			   stop = true;
-		   }
-		   connection.notify();
-		   notify();
 		}
 	
 	}
@@ -97,14 +107,12 @@ public class RPCServer implements Runnable {
 
 		if (this.connection != null) {
 			this.connection.close();
-			this.connection = null;
 		} else {
 			System.out.println("RPCServer.stop - connection was null");
 		}
 
 		if (this.msgserver != null) {
 			this.msgserver.stop();
-			this.msgserver = null;
 		} else {
 			System.out.println("RPCServer.stop - msgserver was null");
 		}
