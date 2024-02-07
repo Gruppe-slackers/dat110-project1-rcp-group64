@@ -37,9 +37,6 @@ public class MessageUtils {
 			return null;
 		}
 		int segmentLength = segment[0];
-		if (segmentLength != segment.length -1) {
-			throw new UnsupportedOperationException("Length of data dont match");
-		}
 		byte[] data = new byte[segmentLength];
 		arraycopy(segment, 1, data, 0, segmentLength);
 
