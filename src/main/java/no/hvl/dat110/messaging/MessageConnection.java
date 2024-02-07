@@ -7,6 +7,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 
 
@@ -37,30 +40,32 @@ public class MessageConnection {
 
 	public void send(Message message) throws IOException {
 		if (message == null || message.getData().length > MessageUtils.SEGMENTSIZE) {
-			throw new UnsupportedOperationException(TODO.method());
+			throw new UnsupportedOperationException("Message is not valid");
 		}
-		byte[] data = message.getData();
-		outStream.write(data, 1, data[0]);
+		byte[] data = MessageUtils.encapsulate(message);
+		if (data == null) {
+			throw new UnsupportedOperationException("missing data submitted");
+		}
+
+		System.out.println("sent: " + Arrays.toString(data));
+		outStream.write(data);
 	}
 
 	public Message receive() throws IOException {
-
 		int receivedLength = inStream.read();
 		if (receivedLength == -1) {
 			return null;
 		}
+		byte[] receivedMessage = new byte[receivedLength];
+		if (receivedLength != 0) {
+			receivedMessage = inStream.readNBytes(receivedLength);
+		}
 
-		byte[] receivedMessage = inStream.readAllBytes();
 		if (receivedMessage == null || receivedMessage.length > MessageUtils.SEGMENTSIZE) {
-			throw new UnsupportedOperationException(TODO.method());
+			throw new UnsupportedOperationException("Mottatt data er ikke gyldig");
 		}
 
-		if (receivedLength > MessageUtils.SEGMENTSIZE-1 || receivedLength < 0) {
-			throw new UnsupportedOperationException(TODO.method());
-		}
-
-		return MessageUtils.decapsulate(receivedMessage);
-		
+		return new Message(receivedMessage);
 	}
 
 	// close the connection by closing streams and the underlying socket	

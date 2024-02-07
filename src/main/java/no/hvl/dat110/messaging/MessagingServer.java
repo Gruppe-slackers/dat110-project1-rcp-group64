@@ -13,7 +13,6 @@ public class MessagingServer {
 	public MessagingServer(int port) {
 
 		try {
-
 			this.welcomeSocket = new ServerSocket(port);
 
 		} catch (IOException ex) {

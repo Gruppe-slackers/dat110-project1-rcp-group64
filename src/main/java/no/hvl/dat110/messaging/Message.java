@@ -12,7 +12,7 @@ public class Message {
 	// construction a Message with the data provided
 	public Message(final byte[] data) {
 		if (data == null || data.length >= SEGMENTSIZE) {
-			throw new UnsupportedOperationException(TODO.constructor("Message"));
+			throw new UnsupportedOperationException("Message is too long");
 		}
 		this.data = data;
 	}

@@ -2,6 +2,7 @@ package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
@@ -10,7 +11,7 @@ public class MessageUtils {
 
 	public static final int SEGMENTSIZE = 128;
 
-	public static int MESSAGINGPORT = 8080;
+	public static int MESSAGINGPORT = 8083;
 	public static String MESSAGINGHOST = "localhost";
 
 	public static byte[] encapsulate(Message message) {
@@ -21,26 +22,23 @@ public class MessageUtils {
 
 		int dataLength = MessageUtils.getSegmentSize(data);
 
-		System.out.print(dataLength + Arrays.toString(data));
-
 		if (dataLength >= SEGMENTSIZE || dataLength < 0) {
-			throw new UnsupportedOperationException(TODO.method());
+			throw new UnsupportedOperationException("Data is outside of bounds");
 		}
 		byte[] segment = new byte[SEGMENTSIZE];
 		segment[0] = (byte)dataLength;
 		arraycopy(data, 0, segment, 1, dataLength);
-
 		return segment;
 
 	}
 
 	public static Message decapsulate(byte[] segment) {
-		if (segment == null) {
+		if (segment == null || segment.length == 0) {
 			return null;
 		}
-		int segmentLength = Byte.toUnsignedInt(segment[0]);
-		if(segmentLength >= SEGMENTSIZE) {
-			throw new UnsupportedOperationException(TODO.method());
+		int segmentLength = segment[0];
+		if (segmentLength != segment.length -1) {
+			throw new UnsupportedOperationException("Length of data dont match");
 		}
 		byte[] data = new byte[segmentLength];
 		arraycopy(segment, 1, data, 0, segmentLength);
