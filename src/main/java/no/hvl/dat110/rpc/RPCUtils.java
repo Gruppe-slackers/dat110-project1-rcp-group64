@@ -67,10 +67,12 @@ public class RPCUtils {
 	}
 	
 	public static void unmarshallVoid(byte[] data) {
-		if (data.length >= 1) {
+		if (data == null) {
+			return;
+		}
+		if (data.length == 1) {
 			throw new UnsupportedOperationException(ErrorMessages.invalidType());
 		}
-
 	}
 
 	// convert boolean to a byte array representation

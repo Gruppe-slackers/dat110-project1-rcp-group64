@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
 import static no.hvl.dat110.messaging.MessageUtils.getSegmentSize;
-
+import static no.hvl.dat110.rpc.RPCUtils.MARSHALSIZE;
 public class RPCClient extends Thread {
 
 	// underlying messaging client used for RPC communication
@@ -33,7 +33,6 @@ public class RPCClient extends Thread {
 	
 	public void disconnect() {
 		this.connection.close();
-		this.msgclient.notify();
 
 		boolean closed;
 		try {
@@ -44,7 +43,7 @@ public class RPCClient extends Thread {
 		}
 
 		if (!closed) {
-			throw new RuntimeException(TODO.method());
+			throw new RuntimeException("Connection not closed");
 		}
 	}
 
@@ -56,46 +55,44 @@ public class RPCClient extends Thread {
 	 */
 
 	public byte[] call(final byte rpcid, final byte[] param) throws IOException {
-		if (getSegmentSize(param) > SEGMENTSIZE-1) {
-			throw new UnsupportedOperationException(TODO.method());
+		if (getSegmentSize(param) > MARSHALSIZE-1) {
+			throw new UnsupportedOperationException();
 		}
 
 		Message message = new Message(RPCUtils.encapsulate(rpcid, param));
+		System.out.println(message);
+		final MessageConnection messageConnection = this.connection;
+		synchronized (messageConnection) {
+			try {
+				byte[] responseData = null;
 
-		if (message == null) {
-			throw new UnsupportedOperationException(TODO.method());
-		}
+				messageConnection.reqQueue.acquire();
+				messageConnection.send(message);
+				Message response = messageConnection.receive();
+				while (response == null) {
+					response = messageConnection.receive();
 
-		try {
-			byte[] responseData = null;
-
-			connection.reqQueue.acquire();
-			connection.send(message);
-			Message response = connection.receive();
-			while (response == null) {
-				connection.wait();
-				response = connection.receive();
-
-				/** making sure we get response matching our rpcid */
-				if (response != null) {
-					responseData = response.getData();
-					if (responseData != null && (int) responseData[0] != rpcid) {
-						response = null;
+					/** making sure we get response matching our rpcid */
+					if (response != null) {
+						responseData = response.getData();
+						if (responseData != null && (int) responseData[0] != rpcid) {
+							response = null;
+						}
 					}
 				}
-			}
 
-			/** release and notify other clients to ask for request */
-			connection.reqQueue.release();
-			connection.notify();
-			if (responseData == null) {
+				/** release and notify other clients to ask for request */
+				messageConnection.reqQueue.release();
+				messageConnection.notify();
+				if (responseData == null) {
+					return null;
+				}
+				return RPCUtils.decapsulate(responseData);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 				return null;
 			}
-			return RPCUtils.decapsulate(responseData);
-
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return null;
 		}
 	}
 

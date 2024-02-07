@@ -12,4 +12,8 @@ public class ErrorMessages {
     public static String invalidType() {
         return "Data received is invalid";
     }
+
+    public static String missingRPCID() {
+        return "RPCID is missing";
+    }
 }

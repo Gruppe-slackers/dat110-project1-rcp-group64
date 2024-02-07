@@ -2,7 +2,6 @@ package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
