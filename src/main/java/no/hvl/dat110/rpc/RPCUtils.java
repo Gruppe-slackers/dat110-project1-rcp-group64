@@ -1,9 +1,9 @@
 package no.hvl.dat110.rpc;
 
-import no.hvl.dat110.TODO;
 import no.hvl.dat110.utils.ErrorMessages;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
@@ -22,24 +22,29 @@ public class RPCUtils {
 
 		byte[] rpcmsg = new byte[segmentSize + 1];
 		rpcmsg[0] = rpcid;
+		System.out.println("EC: " + rpcid + " " + Arrays.toString(payload));
 		arraycopy(payload, 0, rpcmsg, 1, segmentSize);
-		
+		System.out.println("EX: " + Arrays.toString(rpcmsg));
+
 		return rpcmsg;
 	}
 	
 	public static byte[] decapsulate(byte[] rpcmsg) {
-		System.out.println("DEC: " + Arrays.toString(rpcmsg));
-		if (rpcmsg == null || rpcmsg.length == 0) {
+		if (rpcmsg == null) {
 			return null;
+		}
+		if (rpcmsg.length == 0) {
+			return new byte[0];
 		}
 		if (rpcmsg.length >= MARSHALSIZE) {
 			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
-
-		byte[] payload = new byte[rpcmsg.length -1];
-		arraycopy(rpcmsg, 1, payload, 0, rpcmsg.length -1);
+		System.out.println("DC: " + Arrays.toString(rpcmsg));
 		
-		return payload;
+		byte[] outp = Arrays.copyOfRange(rpcmsg, 1, rpcmsg.length);
+		
+		System.out.println("DX: " + Arrays.toString(outp));
+		return outp;
 	}
 
 	// convert String to byte array
@@ -59,7 +64,7 @@ public class RPCUtils {
 			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 
 
-		return new String(data);
+		return new String(data, StandardCharsets.UTF_8);
 	}
 	
 	public static byte[] marshallVoid() {
@@ -67,10 +72,7 @@ public class RPCUtils {
 	}
 	
 	public static void unmarshallVoid(byte[] data) {
-		if (data == null) {
-			return;
-		}
-		if (data.length == 1) {
+		if (data == null || data.length == 1) {
 			throw new UnsupportedOperationException(ErrorMessages.invalidType());
 		}
 	}

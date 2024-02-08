@@ -10,11 +10,11 @@ public class RPCClientStopStub extends RPCLocalStub {
 	
 	// client-side implementation of the built-in server stop RPC method
 	public void stop () throws IOException {
-		
+
 		byte[] request = RPCUtils.marshallVoid();
-		
+
 		byte[] response = rpcclient.call(RPCCommon.RPIDSTOP,request);
-		
+
 		RPCUtils.unmarshallVoid(response);
 	
 	}

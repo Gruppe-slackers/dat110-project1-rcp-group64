@@ -5,6 +5,7 @@ import no.hvl.dat110.rpc.RPCLocalStub;
 import no.hvl.dat110.rpc.RPCUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class TestBooleanBooleanStub extends RPCLocalStub {
 	
