@@ -47,10 +47,6 @@ public class RPCServer implements Runnable {
 				try {
 					messageConnection.resQueue.acquire();
 					requestmsg = messageConnection.receive();
-					while (requestmsg == null) {
-						requestmsg = messageConnection.receive();
-					}
-
 
 					if (getSegmentSize(requestmsg.getData()) > SEGMENTSIZE) {
 						throw new UnsupportedOperationException(TODO.method());

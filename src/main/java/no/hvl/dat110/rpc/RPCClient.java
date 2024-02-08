@@ -72,25 +72,10 @@ public class RPCClient extends Thread {
 
 
 				Message response = messageConnection.receive();
-				System.out.println("SADGE");
-				while (response == null) {
-					System.out.println("response == null");
-					response = messageConnection.receive();
-
-					/** making sure we get response matching our rpcid */
-					if (response != null) {
-						responseData = response.getData();
-						if (responseData != null && (int) responseData[0] != rpcid) {
-							response = null;
-						}
-					}
-				}
-
-				messageConnection.resQueue.release();
+				responseData = response.getData();
 				System.out.println("POGG");
 				/** release and notify other clients to ask for request */
 				messageConnection.reqQueue.release();
-				messageConnection.notify();
 				if (responseData == null) {
 					return null;
 				}
