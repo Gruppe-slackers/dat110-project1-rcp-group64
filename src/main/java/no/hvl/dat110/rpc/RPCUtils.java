@@ -3,6 +3,7 @@ package no.hvl.dat110.rpc;
 import no.hvl.dat110.utils.ErrorMessages;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -102,7 +103,7 @@ public class RPCUtils {
 	// integer to byte array representation
 	public static byte[] marshallInteger(int x) {
 
-		byte[] encoded = BigInteger.valueOf(x).toByteArray();
+		byte[] encoded = ByteBuffer.allocate(4).putInt(x).array();
 
 		if (getSegmentSize(encoded) > MARSHALSIZE-1) {
 			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
@@ -118,6 +119,6 @@ public class RPCUtils {
 			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
 
-		return new BigInteger(data).intValue();
+		return ByteBuffer.wrap(data).getInt();
 	}
 }

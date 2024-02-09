@@ -37,7 +37,6 @@ public class RPCClient extends Thread {
 	public void disconnect() {
 		if (this.connection != null) {
 			this.connection.close();
-			this.connection = null;
 		}
 	}
 
