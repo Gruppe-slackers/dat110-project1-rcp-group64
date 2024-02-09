@@ -1,17 +1,20 @@
 package no.hvl.dat110.messaging;
 
 
-import no.hvl.dat110.TODO;
 import no.hvl.dat110.utils.ErrorMessages;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.concurrent.Semaphore;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.lang.System.arraycopy;
+import static java.lang.System.getLogger;
+import static no.hvl.dat110.messaging.MessageUtils.SEGMENTSIZE;
+import static no.hvl.dat110.messaging.MessageUtils.decapsulate;
 
 
 public class MessageConnection {
@@ -19,9 +22,7 @@ public class MessageConnection {
 	private DataOutputStream outStream; // for writing bytes to the underlying TCP connection
 	private DataInputStream inStream; // for reading bytes from the underlying TCP connection
 	private Socket socket; // socket for the underlying TCP connection
-	public final Semaphore reqQueue = new Semaphore(1);
-	public final Semaphore resQueue = new Semaphore(1);
-
+	public final AtomicBoolean trigger = new AtomicBoolean(true);
 	public MessageConnection(Socket socket) {
 
 		try {
@@ -39,8 +40,11 @@ public class MessageConnection {
 		}
 	}
 
-	public void send(Message message) throws IOException {
-		if (message == null || message.getData().length > MessageUtils.SEGMENTSIZE) {
+	public void send(Message message) {
+		if (message ==  null) {
+			return;
+		}
+		if (message.getData().length > SEGMENTSIZE) {
 			throw new UnsupportedOperationException("Message is not valid");
 		}
 		byte[] data = MessageUtils.encapsulate(message);
@@ -48,28 +52,21 @@ public class MessageConnection {
 			throw new UnsupportedOperationException("missing data submitted");
 		}
 
-		System.out.println("sent: " + Arrays.toString(data));
-		outStream.write(data);
-	}
+        try {
+            outStream.write(data);
+        } catch (IOException ignored) {}
+    }
 
-	public Message receive() throws IOException {
-		int receivedLength = inStream.read();
-		if (receivedLength == -1) {
-			return null;
-		}
-		byte[] receivedMessage = new byte[receivedLength];
-		if (receivedLength != 0) {
-			receivedMessage = inStream.readNBytes(receivedLength);
-		}
+	public Message receive() {
+		byte[] receivedMessage = new byte[SEGMENTSIZE];
 
-		if (receivedMessage == null) {
-			throw new UnsupportedOperationException(ErrorMessages.invalidType());
-		}
-		if (receivedMessage.length > MessageUtils.SEGMENTSIZE) {
-			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
+		try {
+			inStream.readFully(receivedMessage);
+		} catch (IOException e) {
+			System.out.println(e);
 		}
 
-		return new Message(receivedMessage);
+		return decapsulate(receivedMessage);
 	}
 
 	// close the connection by closing streams and the underlying socket	

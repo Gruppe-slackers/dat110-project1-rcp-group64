@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @TestMethodOrder(OrderAnnotation.class)
 public class TestRPC {
 
-	private static int PORT = 8088;
+	private static int PORT = 8080;
 	private static String SERVER = "localhost";
 
 	@Test
@@ -356,13 +356,17 @@ public class TestRPC {
 
 					// boolean test case
 
+					System.out.println("boolean m(true) started");
 					boolean testb = true;
 					boolean resb = boolboolstub.m(testb);
-
+					System.out.println("boolean m(true) returned " + resb);
 					assertEquals(!testb, resb);
 
+					System.out.println("boolean m(false) started");
 					testb = false;
 					resb = boolboolstub.m(testb);
+					System.out.println("boolean m(false) returned " + resb);
+
 					assertEquals(!testb, resb);
 
 					stopstub.stop();
