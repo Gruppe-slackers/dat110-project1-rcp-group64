@@ -100,9 +100,7 @@ public class RPCUtils {
 	 * @param data {@link byte[]} we want to unmarshall to {@link Void}
 	 */
 	public static void unmarshallVoid(byte[] data) {
-		if (data == null || data.length == 1) {
-			throw new UnsupportedOperationException(ErrorMessages.invalidType());
-		}
+
 	}
 
 	/**
