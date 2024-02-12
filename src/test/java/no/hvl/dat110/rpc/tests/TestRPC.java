@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @TestMethodOrder(OrderAnnotation.class)
 public class TestRPC {
 
-	private static int PORT = 8080;
+	private static int PORT = 8096;
 	private static String SERVER = "localhost";
 
 	@Test

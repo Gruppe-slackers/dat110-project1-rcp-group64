@@ -34,9 +34,7 @@ public class RPCUtils {
 
 		byte[] rpcmsg = new byte[segmentSize + 1];
 		rpcmsg[0] = rpcid;
-		System.out.println("EC: " + rpcid + " " + Arrays.toString(payload));
 		arraycopy(payload, 0, rpcmsg, 1, segmentSize);
-		System.out.println("EX: " + Arrays.toString(rpcmsg));
 
 		return rpcmsg;
 	}
@@ -56,11 +54,7 @@ public class RPCUtils {
 		if (rpcmsg.length >= MARSHALSIZE) {
 			throw new UnsupportedOperationException(ErrorMessages.maxLimit());
 		}
-		System.out.println("DC: " + Arrays.toString(rpcmsg));
-		
 		byte[] outp = Arrays.copyOfRange(rpcmsg, 1, rpcmsg.length);
-		
-		System.out.println("DX: " + Arrays.toString(outp));
 		return outp;
 	}
 
@@ -149,7 +143,7 @@ public class RPCUtils {
 // integer to byte array representation
 	public static byte[] marshallInteger(int x) {
 
-		byte[] encoded = ByteBuffer.allocate(MARSHALSIZE).putInt(x).array();
+		byte[] encoded = ByteBuffer.allocate(4).putInt(x).array();
 
 		if (getSegmentSize(encoded) > MARSHALSIZE-1) {
 			throw new UnsupportedOperationException(ErrorMessages.maxLimit());

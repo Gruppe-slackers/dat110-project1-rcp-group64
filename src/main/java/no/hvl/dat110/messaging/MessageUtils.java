@@ -2,6 +2,10 @@ package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.utils.ErrorMessages;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static java.lang.System.arraycopy;
 
 public class MessageUtils {
@@ -22,7 +26,6 @@ public class MessageUtils {
 		byte[] segment = new byte[SEGMENTSIZE];
 		segment[0] = (byte)dataLength;
 		arraycopy(data, 0, segment, 1, dataLength);
-		System.out.println("MEC: " + Arrays.toString(segment));
 		return segment;
 
 	}
@@ -39,13 +42,11 @@ public class MessageUtils {
 		} else {
 			data = Arrays.copyOfRange(segment, 1, segmentLength + 1);
 		}
-		System.out.println("MDC: " + Arrays.toString(data));
 
 		return new Message(data);
 	}
 
 	public static int getSegmentSize(final byte[] bytes) {
-		int index = Arrays.asList(bytes).indexOf(null);
-		return index != -1 ? index : bytes.length;
+		return bytes.length;
 	}
 }
