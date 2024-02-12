@@ -30,7 +30,7 @@ public class RPCClient extends Thread {
 		// connect using the RPC client
 
 		if (this.connection == null) {
-			throw new UnsupportedOperationException(TODO.method());
+			throw new UnsupportedOperationException("Failed to connect");
 		}
 	}
 

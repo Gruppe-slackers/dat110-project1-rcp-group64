@@ -63,7 +63,7 @@ public class MessageConnection {
 		try {
 			inStream.readFully(receivedMessage);
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 
 		return decapsulate(receivedMessage);
